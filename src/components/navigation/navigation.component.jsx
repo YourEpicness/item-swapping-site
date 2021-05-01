@@ -12,7 +12,6 @@ const Navigation = () => (
       <Link className='option' to='/'> <Logo/> </Link>
       <li><Link className='option' to='/sales'> SALES </Link></li>
       <li><Link className='option' to='/trade'> TRADE </Link></li>
-      <li><Link className='option' to='/cart'> CART </Link></li>
       <li><Link className='option' to='/profile'> PROFILE </Link></li>
       <li><Link className='option' to='/signin'> SIGNIN </Link></li>
       <li><Link className='option' to='/register'> REGISTER </Link></li>
