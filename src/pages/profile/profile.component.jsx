@@ -12,12 +12,15 @@ class Profile extends React.Component {
   }
 
     render() {
+
       return(
+
       <div className='profile'>
         <h1> Profile Page </h1>
-        <p> Current Name: </p>
+        <p> Current Name:  </p>
         <p> Current Password: </p>
         <p> Karma Points: </p>
+        <p> Posts: </p>
       </div>
     )
     }

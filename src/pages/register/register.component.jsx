@@ -2,21 +2,12 @@ import React from 'react';
 
 import FormInput from '../../components/form-input/form-input.component';
 import CustomButton from '../../components/custom-button/custom-button.component';
-
+import {auth, createUserProfileDocument} from '../../firebase/firebase.utils';
 import './register.styles.scss';
 
 class RegisterPage extends React.Component {
-
-  userData;
-
-  constructor(props) {
-    super(props);
-
-    this.onChangeDisplayName = this.onChangeDisplayName.bind(this);
-    this.onChangeEmail = this.onChangeEmail.bind(this);
-    this.onChangePassword = this.onChangePassword.bind(this);
-    this.onChangeConfirmPassword = this.onChangeConfirmPassword.bind(this);
-    this.handleSubmit = this.handleSubmit.bind(this);
+  constructor() {
+    super();
 
     this.state = {
       displayName: '',
@@ -26,30 +17,8 @@ class RegisterPage extends React.Component {
     }
   }
 
-  onChangeDisplayName(e) {
-    this.setState({ displayName: e.target.value })
-  }
-
-  onChangeEmail(e) {
-    this.setState({ email: e.target.value })
-  }
-
-  onChangePassword(e) {
-    this.setState({ password: e.target.value })
-  }
-
-  onChangeConfirmPassword(e) {
-    this.setState({ confirmPassword: e.target.value })
-  }
-
-  handleChange = event => {
-    const {name, value} = event.target;
-
-    this.setState({[name]: value});
-  };
-
-  handleSubmit(e) {
-    e.preventDefault();
+  handleSubmit = async event => {
+    event.preventDefault();
 
     const {displayName, email, password, confirmPassword} = this.state;
 
@@ -59,54 +28,38 @@ class RegisterPage extends React.Component {
     }
 
     try {
+      const {user} = await auth.createUserWithEmailAndPassword(email, password);
+
+      await createUserProfileDocument(user, {displayName});
       this.setState({
         displayName: '',
         email: '',
         password: '',
         confirmPassword: ''
-      })
-  } catch (error) {
+      });
+    } catch (error) {
       console.error(error);
     }
   };
 
-  componentDidMount() {
-     this.userData = JSON.parse(localStorage.getItem('user'));
+  handleChange = event => {
+    const {name, value} = event.target;
 
-     if (localStorage.getItem('user')) {
-         this.setState({
-             displayName: this.userData.displayName,
-             email: this.userData.email,
-             password: this.userData.password,
-             confirmPassword: this.userData.confirmPassword
-         })
-     } else {
-         this.setState({
-           displayName: '',
-           email: '',
-           password: '',
-           confirmPassword: ''
-         })
-     }
-   }
-
-   componentWillUpdate(nextProps, nextState) {
-       localStorage.setItem('user', JSON.stringify(nextState));
-   }
-
-
+    this.setState({[name]: value});
+  };
 
 
   render() {
+    const {displayName, email, password, confirmPassword} = this.state;
     return(
     <div className='sign-up'>
-      <h2 className='title'> Sign up with your email and password </h2>
+      <h2> Sign up with your email and password </h2>
       <form className='sign-up-form' onSubmit={this.handleSubmit}>
         <FormInput
           type='text'
           name='displayName'
-          value={this.state.displayName}
-          onChange={this.onChangeDisplayName}
+          value={displayName}
+          onChange={this.handleChange}
           label='Display Name'
           required
         />
@@ -114,17 +67,17 @@ class RegisterPage extends React.Component {
         <FormInput
           type='email'
           name='email'
-          value={this.state.email}
-          onChange={this.onChangeEmail}
-          label='email'
+          value={email}
+          onChange={this.handleChange}
+          label='Email'
           required
         />
 
         <FormInput
           type='password'
           name='password'
-          value={this.state.password}
-          onChange={this.onChangePassword}
+          value={password}
+          onChange={this.handleChange}
           label='password'
           required
         />
@@ -132,8 +85,8 @@ class RegisterPage extends React.Component {
         <FormInput
           type='password'
           name='confirmPassword'
-          value={this.state.confirmPassword}
-          onChange={this.onChangeConfirmPassword}
+          value={confirmPassword}
+          onChange={this.handleChange}
           label='confirm password'
           required
           />

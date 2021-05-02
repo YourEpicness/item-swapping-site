@@ -16,7 +16,8 @@ class ItemInfoPage extends React.Component {
     const {details} = this.state;
     return (
       <div className="item-info-page">
-        <div className="image-container">
+        <div className="title">
+          <h1> Sales </h1>
           <div className="image">
             <img src="" />
           </div>

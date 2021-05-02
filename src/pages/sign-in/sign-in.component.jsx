@@ -1,100 +1,70 @@
 import React from "react";
-import { MDBInput, MDBBtn, MDBCol } from "mdbreact";
-import { Link } from 'react-router-dom';
-import { BrowserRouter as Router, withRouter } from "react-router-dom";
-import 'bootstrap/dist/css/bootstrap.css';
-import './sign-in.styles.scss';
 
-const usersJson = {
-  description: "Login and passwords of users",
-  users: {
-    guest: {
-      email: "guest",
-      password: "guest",
-      type: "user"
-    },
-    admin: {
-      email: "admin@admin",
-      password: "adminpassword",
-      type: "admin"
-    }
-  }
-};
+import "./sign-in.styles.scss";
+import FormInput from "../../components/form-input/form-input.component.jsx";
+import CustomButton from "../../components/custom-button/custom-button.component.jsx";
 
-class SignInPage extends React.Component {
-  state = {
-    email: "",
-    password: "",
-    usersJson: {}
-  };
-  componentDidMount() {
-    this.setState({ usersJson });
+import { auth, signInWithGoogle } from '../../firebase/firebase.utils';
+
+class SignIn extends React.Component {
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      email: "",
+      password: "",
+    };
   }
 
-  getLoginData = (value, type) =>
-    this.setState({
-      [type]: value
-    });
+  handleSubmit = async event => {
+    event.preventDefault();
 
-  onFormSubmit = e => {
-    e.preventDefault();
-    const { usersJson, email, password } = this.state;
-    const filteremail = Object.keys(usersJson.users).filter(
-      e => e === email
-    );
-    if (
-      filteremail.length > 0 &&
-      usersJson.users[email].password === password
-    ) {
-      this.props.history.push("user/loggedin");
-      window.localStorage.setItem(
-        "user",
-        JSON.stringify(usersJson.users[email])
-      );
-    } else {
-      alert("Wrong login or password");
+    const {email, password } = this.state;
+
+    try {
+      await auth.signInWithEmailAndPassword(email, password);
+      this.setState({email:'', password: ''});
+    } catch (error) {
+      console.log(error);
     }
   };
+
+  handleChange = (event) => {
+    const { value, name } = event.target;
+
+    this.setState({ [name]: value });
+  };
+
   render() {
     return (
-      <Router>
-        <div className="center">
-          <MDBCol size="3">
-            <form onSubmit={this.onFormSubmit}>
-              <h2 className="h5 text-center mb-4">Sign in</h2>
-              <div className="grey-text">
-                <MDBInput
-                  label="Type your email"
-                  icon="envelope"
-                  group
-                  type="text"
-                  validate
-                  error="wrong"
-                  success="right"
-                  getValue={value => this.getLoginData(value, "email")}
-                />
-                <MDBInput
-                  label="Type your password"
-                  icon="lock"
-                  group
-                  type="password"
-                  validate
-                  getValue={value => this.getLoginData(value, "password")}
-                />
-              </div>
-              <div className="text-center">
-                <MDBBtn type="submit" onClick={this.onFormSubmit}>
-                  Login
-                </MDBBtn>
-              </div>
+      <div className="sign-in">
+        <h2 className="title"> Sign in with your email and password </h2>
 
-              <p>Don't have an account? <Link className='register' to='/register'> Register here </Link></p>
-            </form>
-          </MDBCol>
-        </div>
-      </Router>
+        <form onSubmit={this.handleSubmit}>
+          <FormInput
+            name="email"
+            type="email"
+            value={this.state.email}
+            label="email"
+            handleChange={this.handleChange}
+            required
+          />
+          <FormInput
+            name="password"
+            type="password"
+            value={this.state.password}
+            handleChange={this.handleChange}
+            label="password"
+            required
+          />
+          <div className="buttons">
+            <CustomButton type="submit"> Sign in </CustomButton>
+            <CustomButton onClick={signInWithGoogle} isGoogleSignIn> {' '}Sign in with Google{' '}</CustomButton>
+          </div>
+        </form>
+      </div>
     );
   }
 }
 
-export default withRouter(SignInPage);
+export default SignIn;
