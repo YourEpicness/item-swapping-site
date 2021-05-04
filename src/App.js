@@ -8,7 +8,9 @@ import ItemInfoPageTrade from './pages/item-info/item-info-trade.component.jsx';
 import SignInPage from './pages/sign-in/sign-in.component.jsx';
 import RegisterPage from './pages/register/register.component.jsx';
 import HomePage from './pages/home-page/home-page.component.jsx';
+import ItemDetailsPage from './pages/item-details/item-details.component.jsx';
 import Profile from './pages/profile/profile.component.jsx';
+import axios from "axios";
 
 import {auth, createUserProfileDocument} from './firebase/firebase.utils';
 
@@ -44,6 +46,7 @@ class App extends React.Component {
     });
   }
 
+
   componentWillUnmount() {
     this.unsubscribeFromAuth();
   }
@@ -75,6 +78,9 @@ class App extends React.Component {
           </Route>
           <Route exact path="/register">
             <RegisterPage />
+          </Route>
+          <Route exact path="/details">
+            <ItemDetailsPage />
           </Route>
         </Switch>
       </div>

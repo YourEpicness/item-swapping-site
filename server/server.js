@@ -1,20 +1,54 @@
-require('rootpath')();
-const express = require('express');
+const express = require("express");
+const bodyParser = require("body-parser");
+const cors = require("cors");
+
 const app = express();
-const cors = require('cors');
-const bodyParser = require('body-parser');
-const errorHandler = require('_middleware/error-handler');
 
-app.use(bodyParser.urlencoded({ extended: false }));
+
+var corsOptions = {
+  origin: "http://localhost:8081"
+};
+
+app.use(cors(corsOptions));
+
+// parse requests of content-type - application/json
 app.use(bodyParser.json());
-app.use(cors());
 
-// api routes
-app.use('/users', require('./users/users.controller'));
+// parse requests of content-type - application/x-www-form-urlencoded
+app.use(bodyParser.urlencoded({ extended: true }));
 
-// global error handler
-app.use(errorHandler);
+// syncing DATABASE
+const db = require("./models");
+const Role = db.role;
 
-// start server
-const port = process.env.NODE_ENV === 'production' ? (process.env.PORT || 80) : 4000;
-app.listen(port, () => console.log('Server listening on port ' + port));
+db.sequelize.sync({ force: true }).then(() => {
+  console.log("Drop and re-sync db.");
+  initial();
+});
+
+function initial() {
+  Role.create({
+    id: 1,
+    name: "user"
+  });
+
+  Role.create({
+    id: 2,
+    name: "admin"
+  });
+}
+
+// simple route
+app.get("/", (req, res) => {
+  res.json({ message: "Welcome to NodeJS connector to db." });
+});
+
+// routes
+require('./routes/auth.routes')(app);
+require('./routes/user.routes')(app);
+
+// set port, listen for requests
+const PORT = process.env.PORT || 4000;
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}.`);
+});
